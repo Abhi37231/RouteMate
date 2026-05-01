@@ -296,11 +296,87 @@ class ProfileTab extends ConsumerWidget {
   }
 
   void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
+    showDialog(
       context: context,
-      applicationName: 'RouteMate',
-      applicationVersion: '1.0.0',
-      applicationLegalese: '© 2024 RouteMate',
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primaryBlue, AppColors.primaryDark],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryBlue.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.map, color: Colors.white, size: 40),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'RouteMate',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Text(
+              'Version 1.0.0',
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Your all-in-one companion for planning collaborative trips, tracking expenses, and exploring the world with friends.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildSocialIcon(Icons.language, 'Web'),
+                _buildSocialIcon(Icons.facebook, 'FB'),
+                _buildSocialIcon(Icons.camera_alt, 'IG'),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              '© 2024 RouteMate Team',
+              style: TextStyle(color: Colors.white24, fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close', style: TextStyle(color: AppColors.primaryBlue)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialIcon(IconData icon, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.white70, size: 24),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10)),
+        ],
+      ),
     );
   }
 }
