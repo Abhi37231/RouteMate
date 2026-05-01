@@ -1,7 +1,9 @@
-﻿/build/
+/build/
 /.dart_tool/
 /.flutter-plugins
 /.flutter-plugins-dependencies
 /.pub-cache/
 /.packages
+.gradle/
+android/.gradle/
 *.log
