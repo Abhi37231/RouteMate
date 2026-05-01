@@ -363,29 +363,37 @@ class HomeTab extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildSummaryItem(
-                  Icons.play_arrow,
-                  _formatTime(timeline.startTime),
-                  'Start',
-                  AppColors.startGreen,
+                Expanded(
+                  child: _buildSummaryItem(
+                    Icons.play_arrow,
+                    _formatTime(timeline.startTime),
+                    'Start',
+                    AppColors.startGreen,
+                  ),
                 ),
-                _buildSummaryItem(
-                  Icons.directions_car,
-                  timeline.totalTravelTimeFormatted,
-                  'Travel',
-                  AppColors.primaryBlue,
+                Expanded(
+                  child: _buildSummaryItem(
+                    Icons.directions_car,
+                    timeline.totalTravelTimeFormatted,
+                    'Travel',
+                    AppColors.primaryBlue,
+                  ),
                 ),
-                _buildSummaryItem(
-                  Icons.hourglass_empty,
-                  timeline.totalStayTimeFormatted,
-                  'Stay',
-                  AppColors.accentAmber,
+                Expanded(
+                  child: _buildSummaryItem(
+                    Icons.hourglass_empty,
+                    timeline.totalStayTimeFormatted,
+                    'Stay',
+                    AppColors.accentAmber,
+                  ),
                 ),
-                _buildSummaryItem(
-                  Icons.flag,
-                  timeline.endTimeFormatted,
-                  'End',
-                  AppColors.endRed,
+                Expanded(
+                  child: _buildSummaryItem(
+                    Icons.flag,
+                    timeline.endTimeFormatted,
+                    'End',
+                    AppColors.endRed,
+                  ),
                 ),
               ],
             ),

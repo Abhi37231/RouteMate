@@ -303,11 +303,14 @@ class TripsTab extends ConsumerWidget {
                                 color: AppColors.textSecondary,
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                _formatDate(trip.startDate),
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 14,
+                              Expanded(
+                                child: Text(
+                                  _formatDate(trip.startDate),
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 14,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
