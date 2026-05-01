@@ -40,10 +40,6 @@ class HomeTab extends ConsumerWidget {
                     _buildQuickActions(context),
                     const SizedBox(height: 24),
 
-                    // Explore Destinations
-                    _buildExploreSection(context, ref),
-                    const SizedBox(height: 24),
-
                     // Recent Trip Section
                     tripsAsync.when(
                       data: (trips) {
@@ -574,59 +570,6 @@ class HomeTab extends ConsumerWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  Widget _buildExploreSection(BuildContext context, WidgetRef ref) {
-    final destinationsAsync = ref.watch(popularDestinationsProvider);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Explore Destinations',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ExploreTripsScreen(),
-                  ),
-                );
-              },
-              child: const Text('See All'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 200,
-          child: destinationsAsync.when(
-            data: (destinations) => ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: destinations.length,
-              itemBuilder: (context, index) {
-                return _buildExploreCard(context, destinations[index]);
-              },
-            ),
-            loading: () => _buildExploreShimmer(),
-            error: (err, _) => Center(
-              child: Text(
-                'Failed to load destinations',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildRecentTripShimmer() {
     return Shimmer.fromColors(
       baseColor: AppColors.darkCard,
@@ -636,85 +579,6 @@ class HomeTab extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExploreShimmer() {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Shimmer.fromColors(
-          baseColor: AppColors.darkCard,
-          highlightColor: AppColors.darkElevated,
-          child: Container(
-            width: 250,
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildExploreCard(BuildContext context, ExploreDestination destination) {
-    return Container(
-      width: 250,
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        color: AppColors.darkCard,
-        borderRadius: BorderRadius.circular(16),
-        image: DecorationImage(
-          image: NetworkImage(destination.imageUrl),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.3),
-            BlendMode.darken,
-          ),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              destination.name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.star, color: Colors.amber, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  destination.rating.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  destination.category,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );
