@@ -1,0 +1,56 @@
+name: route_mate
+description: A hybrid (offline + online) travel planner app that supports multiple transport types.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  
+  # State Management
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  
+  # Local Database
+  sqflite: ^2.3.2
+  path: ^1.8.3
+  
+  # Firebase — Updated to latest stable versions (fixes PigeonUserDetails type cast bug)
+  firebase_core: ^3.12.0        # Latest 3.x branch — required by firebase_auth 5.x
+  firebase_auth: ^5.5.0         # Latest 5.x branch — fixes Android Pigeon interop bug
+  cloud_firestore: ^5.6.0       # Requires firebase_core 3.x
+  google_sign_in: ^6.2.2        # Latest 6.x — null-safe, latest Android API
+  
+  # Maps - OpenStreetMap (free & open source)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  
+  # Utils
+  uuid: ^4.3.3
+  intl: ^0.19.0
+  equatable: ^2.0.5
+  connectivity_plus: ^5.0.2
+  shared_preferences: ^2.2.2
+  geolocator: ^11.0.0
+  permission_handler: ^11.3.0
+  share_plus: ^13.1.0
+  shimmer: ^3.0.0
+  package_info_plus: ^10.1.0
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  riverpod_generator: ^2.3.9
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
