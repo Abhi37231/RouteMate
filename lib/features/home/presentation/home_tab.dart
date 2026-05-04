@@ -146,21 +146,7 @@ class HomeTab extends ConsumerWidget {
   Widget _buildQuickActions(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: _ActionButton(
-            icon: Icons.add_location_alt,
-            label: 'New Trip',
-            color: AppColors.primaryBlue,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const CreateTripScreen(),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 24),
         Expanded(
           child: _ActionButton(
             icon: Icons.explore,

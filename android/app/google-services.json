@@ -12,7 +12,20 @@
           "package_name": "com.routemate.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "865647485739-9bkds7nfprta4ujtspbqefqdu3dn7f0o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.routemate.app",
+            "certificate_hash": "0252c64fb676fc6a12194f1d09d59af3a61e5b02"
+          }
+        },
+        {
+          "client_id": "865647485739-8v1j9fqcf0nbfi4f5lou8vo6qtbkahok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyArT_Xea0PjSYe8e24kKNCTKgtk58KlId0"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "865647485739-8v1j9fqcf0nbfi4f5lou8vo6qtbkahok.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

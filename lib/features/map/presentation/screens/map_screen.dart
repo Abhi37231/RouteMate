@@ -937,13 +937,18 @@ class _MapScreenState extends ConsumerState<MapScreen>
         left: 0,
         right: 0,
         child: Container(
-          height: 120,
+          height: MediaQuery.of(context).size.height * 0.25,
           decoration: BoxDecoration(
             color: AppColors.darkElevated,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          child: TimelineEmptyCard(
-            onAddStop: _addStopAtCenter,
+          child: SafeArea(
+            bottom: true,
+            child: SingleChildScrollView(
+              child: TimelineEmptyCard(
+                onAddStop: _addStopAtCenter,
+              ),
+            ),
           ),
         ),
       );

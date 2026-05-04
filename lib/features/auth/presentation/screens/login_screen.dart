@@ -17,6 +17,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isLogin = true;
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -25,11 +26,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_isLogin && _passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -64,6 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       // Clear password field on error
       _passwordController.clear();
+      _confirmPasswordController.clear();
     }
   }
 
@@ -187,6 +200,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     return null;
                   },
                 ),
+                if (!_isLogin) ...[
+                  const SizedBox(height: 16),
+                  // Confirm Password field
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
                 const SizedBox(height: 24),
                 // Submit button
                 ElevatedButton(
@@ -239,87 +273,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
-                // Demo/Test Mode Button
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[50],
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Testing? Use Demo Account',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: _isLoading ? null : _loginAsDemo,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[600],
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                        ),
-                        child: const Text('Login as Demo User'),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
         ),
       ),
     );
-  }
-
-  /// Demo login - use a pre-created test account
-  Future<void> _loginAsDemo() async {
-    setState(() => _isLoading = true);
-
-    // Use a test email/password (make sure this account exists in Firebase)
-    final success = await ref.read(authStateProvider.notifier).signInWithEmail(
-          'demo@tripplanner.test',
-          'demo123456',
-        );
-
-    setState(() => _isLoading = false);
-
-    if (success && mounted) {
-      ref.read(tripsProvider.notifier).syncTrips();
-      Navigator.of(context).pushReplacementNamed('/home');
-    } else if (mounted) {
-      final errorMsg = ref.read(authErrorProvider);
-
-      // Show dialog if demo account doesn't exist
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Demo Account Not Found'),
-          content: const Text(
-            'The demo account has not been created yet.\n\n'
-            'To use the demo account:\n'
-            '1. Sign up with email: demo@tripplanner.test\n'
-            '2. Password: demo123456\n\n'
-            'Or use your own credentials.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
   }
 }

@@ -1,7 +1,8 @@
 name: route_mate
 description: A hybrid (offline + online) travel planner app that supports multiple transport types.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0
+
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

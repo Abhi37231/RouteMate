@@ -8,11 +8,38 @@ import '../../trips/presentation/screens/create_trip_screen.dart';
 import '../../map/presentation/screens/map_screen.dart';
 
 /// Trips tab showing all saved trips with modern dark UI
-class TripsTab extends ConsumerWidget {
+class TripsTab extends ConsumerStatefulWidget {
   const TripsTab({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TripsTab> createState() => _TripsTabState();
+}
+
+class _TripsTabState extends ConsumerState<TripsTab> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query.toLowerCase();
+    });
+  }
+
+  List<Trip> _filterTrips(List<Trip> trips) {
+    if (_searchQuery.isEmpty) return trips;
+    return trips
+        .where((trip) => trip.name.toLowerCase().contains(_searchQuery))
+        .toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final tripsAsync = ref.watch(tripsProvider);
 
     return Scaffold(
@@ -35,40 +62,56 @@ class TripsTab extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.darkCard,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.add,
-                          color: AppColors.primaryBlue,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const CreateTripScreen(),
-                            ),
-                          );
-                        },
-                        tooltip: 'Create New Trip',
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ),
+                    const SizedBox(width: 16),
                   ],
                 ),
               ),
             ),
-
+            // Search Bar
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Search trips...',
+                    hintStyle: TextStyle(color: AppColors.textSecondary),
+                    prefixIcon: const Icon(Icons.search,
+                        color: AppColors.textSecondary),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear,
+                                color: AppColors.textSecondary),
+                            onPressed: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.darkElevated,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             // Trips List
             tripsAsync.when(
               data: (trips) {
-                if (trips.isEmpty) {
+                final filteredTrips = _filterTrips(trips);
+                if (filteredTrips.isEmpty) {
+                  if (trips.isEmpty) {
+                    return SliverFillRemaining(
+                      child: _buildEmptyState(context),
+                    );
+                  }
                   return SliverFillRemaining(
-                    child: _buildEmptyState(context),
+                    child: _buildNoResultsState(context),
                   );
                 }
 
@@ -77,10 +120,10 @@ class TripsTab extends ConsumerWidget {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final trip = trips[index];
+                        final trip = filteredTrips[index];
                         return _buildTripCard(context, ref, trip);
                       },
-                      childCount: trips.length,
+                      childCount: filteredTrips.length,
                     ),
                   ),
                 );
@@ -181,27 +224,47 @@ class TripsTab extends ConsumerWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const CreateTripScreen(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Create Your First Trip'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryBlue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 16,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          Text(
+            'Tap the + button below to create your first trip',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
             ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoResultsState(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off,
+            size: 64,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No trips found',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try adjusting your search terms',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -221,11 +284,11 @@ class TripsTab extends ConsumerWidget {
         color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: Colors.white.withAlpha(13),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withAlpha(51),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -410,10 +473,10 @@ class TripsTab extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
+          color: color.withAlpha(38),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: color.withValues(alpha: 0.3),
+            color: color.withAlpha(76),
           ),
         ),
         child: Row(
@@ -563,9 +626,7 @@ class TripsTab extends ConsumerWidget {
                     : descController.text.trim(),
                 updatedAt: DateTime.now(),
               );
-              await ref
-                  .read(tripsProvider.notifier)
-                  .updateTrip(updatedTrip);
+              await ref.read(tripsProvider.notifier).updateTrip(updatedTrip);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Trip updated successfully')),
               );
@@ -638,7 +699,7 @@ class TripsTab extends ConsumerWidget {
     );
   }
 
-String _formatDate(DateTime date) {
+  String _formatDate(DateTime date) {
     final months = [
       'Jan',
       'Feb',

@@ -8,9 +8,6 @@ class AuthService {
   final firebase_auth.FirebaseAuth _firebaseAuth;
   late final GoogleSignIn _googleSignIn;
 
-  // Dev mode flag to bypass reCAPTCHA issues
-  static const bool _devMode = true;
-
   AuthService({
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
@@ -42,16 +39,6 @@ class AuthService {
         password: password,
       );
     } on firebase_auth.FirebaseAuthException catch (e) {
-      // If reCAPTCHA network error or general network error in dev mode, retry once
-      if (_devMode &&
-          (e.code == 'network-request-failed' ||
-              e.message?.contains('network') == true)) {
-        await Future.delayed(const Duration(seconds: 2));
-        return await _firebaseAuth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      }
       rethrow;
     }
   }
@@ -67,16 +54,6 @@ class AuthService {
         password: password,
       );
     } on firebase_auth.FirebaseAuthException catch (e) {
-      // If reCAPTCHA network error in dev mode, retry once
-      if (_devMode &&
-          (e.code == 'network-request-failed' ||
-              e.message?.contains('network') == true)) {
-        await Future.delayed(const Duration(seconds: 2));
-        return await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      }
       rethrow;
     }
   }
@@ -134,11 +111,6 @@ class AuthService {
     } catch (e) {
       throw Exception('Google sign-in failed: $e');
     }
-  }
-
-  /// Sign in anonymously (for testing)
-  Future<firebase_auth.UserCredential> signInAnonymously() async {
-    return await _firebaseAuth.signInAnonymously();
   }
 
   /// Send password reset email

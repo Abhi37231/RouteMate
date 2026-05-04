@@ -16,12 +16,22 @@ class UpdateInfo {
   });
 
   factory UpdateInfo.fromFirestore(Map<String, dynamic> data) {
-    return UpdateInfo(
-      latestVersion: data['latest_version'] ?? '1.0.0',
-      minRequiredVersion: data['min_required_version'] ?? '1.0.0',
-      updateUrl: data['update_url'] ?? '',
-      isForceUpdate: data['is_force_update'] ?? false,
-    );
+    try {
+      return UpdateInfo(
+        latestVersion: data['latest_version']?.toString() ?? '1.0.0',
+        minRequiredVersion: data['min_required_version']?.toString() ?? '1.0.0',
+        updateUrl: data['update_url']?.toString() ?? '',
+        isForceUpdate: data['is_force_update'] == true || data['is_force_update'] == 'true',
+      );
+    } catch (e) {
+      print('Error parsing UpdateInfo: $e');
+      return UpdateInfo(
+        latestVersion: '1.0.0',
+        minRequiredVersion: '1.0.0',
+        updateUrl: '',
+        isForceUpdate: false,
+      );
+    }
   }
 }
 
@@ -54,23 +64,34 @@ class UpdateService {
   }
 
   int _compareVersions(String v1, String v2) {
-    List<int> v1Parts = v1.split('.').map(int.parse).toList();
-    List<int> v2Parts = v2.split('.').map(int.parse).toList();
+    try {
+      // Clean up strings (remove +build number or -beta suffix)
+      String cleanV1 = v1.split('+')[0].split('-')[0].trim();
+      String cleanV2 = v2.split('+')[0].split('-')[0].trim();
 
-    for (int i = 0; i < 3; i++) {
-      int p1 = i < v1Parts.length ? v1Parts[i] : 0;
-      int p2 = i < v2Parts.length ? v2Parts[i] : 0;
-      if (p1 < p2) return -1;
-      if (p1 > p2) return 1;
+      List<int> v1Parts = cleanV1.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+      List<int> v2Parts = cleanV2.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+
+      for (int i = 0; i < 3; i++) {
+        int p1 = i < v1Parts.length ? v1Parts[i] : 0;
+        int p2 = i < v2Parts.length ? v2Parts[i] : 0;
+        if (p1 < p2) return -1;
+        if (p1 > p2) return 1;
+      }
+      return 0;
+    } catch (e) {
+      print('Version compare error: $e');
+      return 0;
     }
-    return 0;
   }
 
   Future<void> launchUpdateUrl(String url) async {
     if (url.isEmpty) return;
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
+    try {
+      final uri = Uri.parse(url);
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print('Could not launch update URL: $e');
     }
   }
 }

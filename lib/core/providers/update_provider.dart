@@ -41,30 +41,35 @@ class UpdateNotifier extends StateNotifier<UpdateState> {
   Future<void> checkForUpdates() async {
     state = state.copyWith(isLoading: true);
     
-    final currentVersion = await _service.getCurrentVersion();
-    final info = await _service.getUpdateInfo();
+    try {
+      final currentVersion = await _service.getCurrentVersion();
+      final info = await _service.getUpdateInfo();
 
-    print('🔍 UPDATE CHECK:');
-    print('   - Current App Version: $currentVersion');
-    
-    if (info != null) {
-      print('   - Firestore Latest: ${info.latestVersion}');
-      print('   - Firestore Min Required: ${info.minRequiredVersion}');
+      print('🔍 UPDATE CHECK:');
+      print('   - Current App Version: $currentVersion');
       
-      final hasUpdate = _service.shouldUpdate(currentVersion, info.latestVersion);
-      final forceUpdate = _service.isForceUpdateRequired(currentVersion, info.minRequiredVersion);
-      
-      print('   - Has Update Available: $hasUpdate');
-      print('   - Force Update Needed: ${info.isForceUpdate || forceUpdate}');
+      if (info != null) {
+        print('   - Firestore Latest: ${info.latestVersion}');
+        print('   - Firestore Min Required: ${info.minRequiredVersion}');
+        
+        final hasUpdate = _service.shouldUpdate(currentVersion, info.latestVersion);
+        final forceUpdate = _service.isForceUpdateRequired(currentVersion, info.minRequiredVersion);
+        
+        print('   - Has Update Available: $hasUpdate');
+        print('   - Force Update Needed: ${info.isForceUpdate || forceUpdate}');
 
-      state = state.copyWith(
-        hasUpdate: hasUpdate,
-        isForceUpdate: info.isForceUpdate || forceUpdate,
-        updateInfo: info,
-        isLoading: false,
-      );
-    } else {
-      print('   - Error: Could not fetch update info from Firestore');
+        state = state.copyWith(
+          hasUpdate: hasUpdate,
+          isForceUpdate: info.isForceUpdate || forceUpdate,
+          updateInfo: info,
+          isLoading: false,
+        );
+      } else {
+        print('   - Error: Could not fetch update info from Firestore');
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (e) {
+      print('   - Unexpected Error during update check: $e');
       state = state.copyWith(isLoading: false);
     }
   }

@@ -26,28 +26,33 @@ class UpdateDialog extends StatelessWidget {
           children: [
             const Icon(Icons.system_update, color: AppColors.primaryBlue),
             const SizedBox(width: 12),
-            Text(
-              isForceUpdate ? 'Update Required' : 'Update Available',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                isForceUpdate ? 'Update Required' : 'Update Available',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                softWrap: true,
+              ),
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'A new version ($version) is available.',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              isForceUpdate
-                  ? 'This version is no longer supported. Please update to continue using RouteMate.'
-                  : 'We recommend updating to the latest version for new features and bug fixes.',
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'A new version ($version) is available.',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                isForceUpdate
+                    ? 'This version is no longer supported. Please update to continue using RouteMate.'
+                    : 'We recommend updating to the latest version for new features and bug fixes.',
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+            ],
+          ),
         ),
         actions: [
           if (!isForceUpdate)

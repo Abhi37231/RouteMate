@@ -6,6 +6,7 @@ import '../../auth/presentation/screens/edit_profile_screen.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/providers/update_provider.dart';
 import '../../../core/widgets/update_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Profile tab for user settings
 class ProfileTab extends ConsumerWidget {
@@ -104,9 +105,11 @@ class ProfileTab extends ConsumerWidget {
               icon: Icons.dark_mode_outlined,
               title: 'Dark Mode',
               trailing: Switch(
-                value: themeMode == ThemeMode.dark,
+                value: Theme.of(context).brightness == Brightness.dark,
                 onChanged: (value) {
-                  ref.read(themeProvider.notifier).toggleTheme();
+                  ref.read(themeProvider.notifier).setThemeMode(
+                    value ? ThemeMode.dark : ThemeMode.light,
+                  );
                 },
                 activeColor: AppColors.primaryBlue,
               ),
@@ -148,6 +151,13 @@ class ProfileTab extends ConsumerWidget {
                 if (context.mounted) {
                   if (updateState.hasUpdate) {
                     _showManualUpdateDialog(context, updateState);
+                  } else if (updateState.updateInfo == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error: Could not reach Firebase or config is missing!'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -345,9 +355,9 @@ class ProfileTab extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildSocialIcon(Icons.language, 'Web'),
-                _buildSocialIcon(Icons.facebook, 'FB'),
-                _buildSocialIcon(Icons.camera_alt, 'IG'),
+                _buildSocialIcon(Icons.language, 'Web', 'https://portfolio-phi-ashen-4i9pqyjggp.vercel.app/'),
+                _buildSocialIcon(Icons.camera_alt, 'IG', 'https://www.instagram.com/abhinandan_2603/'),
+                _buildSocialIcon(Icons.work, 'LinkedIn', 'https://in.linkedin.com/in/abhinandan-yalamante-8285112b2'),
               ],
             ),
             const SizedBox(height: 20),
@@ -367,15 +377,25 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildSocialIcon(IconData icon, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.white70, size: 24),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10)),
-        ],
+  Widget _buildSocialIcon(IconData icon, String label, String url) {
+    return InkWell(
+      onTap: () async {
+        try {
+          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        } catch (e) {
+          debugPrint('Could not launch $url');
+        }
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white70, size: 24),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10)),
+          ],
+        ),
       ),
     );
   }
